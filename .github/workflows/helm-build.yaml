@@ -19,7 +19,7 @@ jobs:
       - name: Checkout repository (main branch)
         uses: actions/checkout@v4
         with:
-          ref: main   # ensures we're on main, not detached HEAD
+          ref: main   # ensures we’re on main, not detached HEAD
 
       - name: Set up Helm
         uses: azure/setup-helm@v4
@@ -34,20 +34,21 @@ jobs:
           mkdir -p packaged
           helm package ./helmchart --destination packaged
 
-      - name: Upload chart artifact
+      # ✅ Upload the packaged chart as an artifact
+      - name: Upload Helm chart artifact
         uses: actions/upload-artifact@v4
         with:
           name: webapp-chart
           path: packaged/*.tgz
 
-      - name: Create or update Helm repo index
+      # Optional: publish to GitHub Pages
+      - name: Publish chart to GitHub Pages
+        if: startsWith(github.ref, 'refs/tags/')  # only publish on tag
         run: |
           mkdir -p docs
           mv ./packaged/*.tgz ./docs/
-          helm repo index docs --url https://$GITHUB_REPOSITORY_OWNER.github.io/$(basename $GITHUB_REPOSITORY)
+          helm repo index docs --url https://enz2g.github.io/webapp
 
-      - name: Commit and push updated Helm repo
-        run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs
