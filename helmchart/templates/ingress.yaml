@@ -4,8 +4,8 @@ kind: Ingress
 metadata:
   name: {{ include "webapp.fullname" . }}
   annotations:
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "{{ .Values.ingress.forceSSLRedirect | default "true" }}"
     kubernetes.io/ingress.class: {{ .Values.ingress.className }}
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "{{ .Values.ingress.forceSSLRedirect | default "true" }}"
 spec:
   rules:
     - host: {{ .Values.ingress.host }}
@@ -18,7 +18,7 @@ spec:
                 name: {{ include "webapp.fullname" . }}
                 port:
                   number: {{ .Values.service.port }}
-{{- if .Values.ingress.tls }}
+{{- if and .Values.ingress.tls (eq .Values.ingress.tls true) }}
   tls:
     - hosts:
         - {{ .Values.ingress.host }}
