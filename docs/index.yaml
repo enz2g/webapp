@@ -3,6 +3,16 @@ entries:
   webapp:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2025-10-06T08:57:51.31126347Z"
+    description: A Helm chart for the enz2g/webapp container
+    digest: 8f751c0a343d98d9efde11173f6db1baa4530468a473cebfe2491af850b96b30
+    name: webapp
+    type: application
+    urls:
+    - https://github.com/enz2g/webapp/releases/download/v0.1.11/webapp-0.1.11.tgz
+    version: 0.1.11
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2025-10-06T08:19:18.502288635Z"
     description: A Helm chart for the enz2g/webapp container
     digest: 706b836b8c9a83de535c9221ea6cd4c695c67bdcd00d8f2c6ee71cbea5dfc601
@@ -11,4 +21,4 @@ entries:
     urls:
     - https://enz2g.github.io/webapp/webapp-0.1.9.tgz
     version: 0.1.9
-generated: "2025-10-06T08:19:18.501964428Z"
+generated: "2025-10-06T08:57:51.310953082Z"
