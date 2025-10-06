@@ -4,7 +4,7 @@ kind: Ingress
 metadata:
   name: {{ include "webapp.fullname" . }}
   annotations:
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "{{ .Values.ingress.forceSSLRedirect | default "false" }}"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "{{ .Values.ingress.forceSSLRedirect | default "true" }}"
     kubernetes.io/ingress.class: {{ .Values.ingress.className }}
 spec:
   rules:
