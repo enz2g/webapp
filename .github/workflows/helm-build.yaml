@@ -61,7 +61,7 @@ jobs:
           helm lint helmchart
           helm package helmchart
           mkdir -p artifacts
-          mv *.tgz artifacts/
+          mv helmchart-*.tgz artifacts/
 
       # Upload as workflow artifact
       - name: Upload Helm chart artifact
@@ -78,15 +78,22 @@ jobs:
           name: "Helm Chart v${{ steps.bump_version.outputs.new_version }}"
           files: artifacts/*.tgz
 
-      # Publish to GitHub Pages
-      - name: Publish chart to GitHub Pages
+      # Generate index.yaml pointing to GitHub release URL
+      - name: Generate Helm repo index
         run: |
           mkdir -p docs
-          mv artifacts/*.tgz docs/
-          helm repo index docs --url https://enz2g.github.io/webapp
+          release_url="https://github.com/${{ github.repository }}/releases/download/v${{ steps.bump_version.outputs.new_version }}"
+          chart_file=$(basename artifacts/*.tgz)
+          # copy chart temporarily to docs for index generation
+          cp artifacts/*.tgz docs/
+          helm repo index docs --url "$release_url" --merge docs/index.yaml || true
+          rm docs/$chart_file  # remove local tgz, we don't commit it
 
+      # Commit updated index.yaml only
+      - name: Commit index.yaml
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/index.yaml
-          git commit -m "chore(helm): publish chart v${{ steps.bump_version.outputs.new_version }}" || echo "No changes to commit"
+          git commit -m "chore(helm): update index.yaml for v${{ steps.bump_version.outputs.new_version }}" || echo "No changes to commit"
           git push origin HEAD:${GITHUB_REF_NAME}
