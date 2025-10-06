@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: {{ include "webapp.name" . }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository | default "enz2g/webapp" }}:{{ .Values.image.tag | default "latest"}}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 80
