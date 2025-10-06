@@ -87,6 +87,6 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/*
+          git add docs/index.yaml
           git commit -m "chore(helm): publish chart v${{ steps.bump_version.outputs.new_version }}" || echo "No changes to commit"
           git push origin HEAD:${GITHUB_REF_NAME}
