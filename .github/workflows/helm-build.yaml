@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
     paths:
       - 'helmchart/**'
-      - '.github/workflows/helm.yaml'
+      - '.github/workflows/helm-build.yaml'
 
 permissions:
   contents: write  # allow GITHUB_TOKEN to push commits and releases
