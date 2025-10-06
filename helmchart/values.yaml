@@ -1,0 +1,17 @@
+image:
+  repository: enz2g/webapp
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: nginx
+  host: local.app
+  tls: false  # set to true if you want to use TLS locally
+
+config:
+  appVersion: "v1.0.0"

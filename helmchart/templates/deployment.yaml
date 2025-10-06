@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "webapp.fullname" . }}
+  labels:
+    app: {{ include "webapp.name" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "webapp.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "webapp.name" . }}
+    spec:
+      containers:
+        - name: {{ include "webapp.name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 80
+          env:
+            - name: APP_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "webapp.fullname" . }}-config
+                  key: APP_VERSION
