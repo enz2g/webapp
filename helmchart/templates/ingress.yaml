@@ -4,13 +4,7 @@ kind: Ingress
 metadata:
   name: {{ include "webapp.fullname" . }}
   annotations:
-    nginx.ingress.kubernetes.io/proxy-buffer-size: {{ .Values.ingress.proxyBufferSize | default "16k" }}
-    nginx.ingress.kubernetes.io/proxy-connect-timeout: "{{ .Values.ingress.proxyConnectTimeout | default "300" }}"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "{{ .Values.ingress.proxyReadTimeout | default "300" }}"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "{{ .Values.ingress.proxySendTimeout | default "300" }}"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "{{ .Values.ingress.forceSSLRedirect | default "true" }}"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubDomains; preload";
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "{{ .Values.ingress.forceSSLRedirect | default "false" }}"
     kubernetes.io/ingress.class: {{ .Values.ingress.className }}
 spec:
   rules:
