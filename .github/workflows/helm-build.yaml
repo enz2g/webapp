@@ -1,56 +1,92 @@
-name: Build & Publish Helm Chart
+name: Helm Chart CI/CD
 
 on:
   push:
-    branches:
-      - main
-    tags:
-      - 'v*.*.*'
+    branches: [ "main" ]
+    paths:
+      - 'helmchart/**'
+      - '.github/workflows/helm.yaml'
+
+permissions:
+  contents: write  # allow GITHUB_TOKEN to push commits and releases
 
 jobs:
-  build-and-publish:
-    name: Build and Publish Helm Chart
+  build:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-
     steps:
-      - name: Checkout repository (main branch)
-        uses: actions/checkout@v4
-        with:
-          ref: main   # ensures we’re on main, not detached HEAD
+      - uses: actions/checkout@v4
+      # Add app build/test steps here if needed
+
+  helm:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Set up Helm
         uses: azure/setup-helm@v4
         with:
-          version: v3.14.4
+          version: v3.14.0
 
-      - name: Lint Helm chart
-        run: helm lint ./helmchart
-
-      - name: Package Helm chart
+      # Get current chart version
+      - name: Get current chart version
+        id: get_version
         run: |
-          mkdir -p packaged
-          helm package ./helmchart --destination packaged
+          version=$(grep '^version:' helmchart/Chart.yaml | awk '{print $2}')
+          echo "version=$version" >> $GITHUB_OUTPUT
 
-      # ✅ Upload the packaged chart as an artifact
+      # Bump patch version
+      - name: Bump chart patch version
+        id: bump_version
+        run: |
+          old=${{ steps.get_version.outputs.version }}
+          base=$(echo $old | cut -d. -f1-2)
+          patch=$(echo $old | cut -d. -f3)
+          new="$base.$((patch+1))"
+          echo "Bumping $old → $new"
+          sed -i "s/^version:.*/version: $new/" helmchart/Chart.yaml
+          echo "new_version=$new" >> $GITHUB_OUTPUT
+
+      # Commit bumped version
+      - name: Commit bumped version
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "chore(helm): bump chart version to ${{ steps.bump_version.outputs.new_version }}" || echo "No changes to commit"
+          git push origin HEAD:${GITHUB_REF_NAME}
+
+      # Lint and package chart
+      - name: Lint and package chart
+        run: |
+          helm lint helmchart
+          helm package helmchart
+          mkdir -p artifacts
+          mv helmchart-*.tgz artifacts/
+
+      # Upload as workflow artifact
       - name: Upload Helm chart artifact
         uses: actions/upload-artifact@v4
         with:
-          name: webapp-chart
-          path: packaged/*.tgz
+          name: webapp-helm-chart
+          path: artifacts/*.tgz
 
-      # Optional: publish to GitHub Pages
+      # Create GitHub Release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.bump_version.outputs.new_version }}
+          name: "Helm Chart v${{ steps.bump_version.outputs.new_version }}"
+          files: artifacts/*.tgz
+
+      # Publish to GitHub Pages
       - name: Publish chart to GitHub Pages
-        if: startsWith(github.ref, 'refs/tags/')  # only publish on tag
         run: |
           mkdir -p docs
-          mv ./packaged/*.tgz ./docs/
+          mv artifacts/*.tgz docs/
           helm repo index docs --url https://enz2g.github.io/webapp
 
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs
-          git commit -m "Publish Helm chart $GITHUB_REF_NAME" || echo "No changes to commit"
-          git push origin main
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/*
+          git commit -m "chore(helm): publish chart v${{ steps.bump_version.outputs.new_version }}" || echo "No changes to commit"
+          git push origin HEAD:${GITHUB_REF_NAME}
