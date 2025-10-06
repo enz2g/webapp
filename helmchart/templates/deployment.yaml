@@ -20,9 +20,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 80
-          env:
-            - name: APP_VERSION
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "webapp.fullname" . }}-config
-                  key: APP_VERSION
+          envFrom:
+            - configMapRef:
+                name: {{ include "webapp.fullname" . }}-config
+                  
