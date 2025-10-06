@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: {{ include "webapp.fullname" . }}-config
 data:
-  APP_VERSION: {{ .Values.config.appVersion | quote }}
+  APP_VERSION: "{{ .Values.config.appVersion | default "v1.0.0" }}"

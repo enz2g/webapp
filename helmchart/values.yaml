@@ -13,5 +13,4 @@ ingress:
   host: bradsapp.local
   tls: true # set to true if you want to use TLS locally
 
-config:
-  appVersion: "v1.0.0"
+
