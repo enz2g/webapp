@@ -75,6 +75,15 @@ The GitHub Actions workflow (`.github/workflows/helm-build.yaml`) performs:
 2. **Publish to GitHub Pages** – pushes `index.yaml` and `.tgz` to `docs/` for `https://enz2g.github.io/webapp/`.
 3. **ArgoCD Sync** – ArgoCD will need to update to new chart version to bring in changes.
 
+The GitHub Actions workflow (`.github/workflows/docker-build.yaml`) performs:
+
+1. **CI/CD: Docker Image Build and Push**
+2. **Builds using: Docker Buildx**
+3. **Pushes to: Docker Hub (latest and commit SHA tags)**
+4. **Requires pipeline secrets:**
+        DOCKER_USERNAME
+        DOCKER_PASSWORD
+
 ---
 
 ## 📦 Helm Repository
@@ -125,3 +134,5 @@ Docker build  -t enz2g/webapp:local app\.
 Docker run enz2g/webapp:local 
 ```
 Then open a browser and go to Localhost:3000
+
+---
