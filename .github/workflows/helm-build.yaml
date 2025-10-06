@@ -22,12 +22,12 @@ jobs:
           version: v3.14.4
 
       - name: Lint Helm chart
-        run: helm lint ./webapp/helmchart
+        run: helm lint ./helmchart
 
       - name: Package Helm chart
         run: |
           mkdir -p packaged
-          helm package ./webapp/helmchart --destination packaged
+          helm package ./helmchart --destination packaged
 
       - name: Upload chart artifact
         uses: actions/upload-artifact@v4
