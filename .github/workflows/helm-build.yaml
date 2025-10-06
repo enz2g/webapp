@@ -61,7 +61,7 @@ jobs:
           helm lint helmchart
           helm package helmchart
           mkdir -p artifacts
-          mv helmchart-*.tgz artifacts/
+          mv *.tgz artifacts/
 
       # Upload as workflow artifact
       - name: Upload Helm chart artifact
