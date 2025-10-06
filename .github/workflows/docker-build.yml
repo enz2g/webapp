@@ -24,6 +24,10 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./app               # 👈 This sets the working directory for Docker build
+          file: ./app/Dockerfile       # 👈 Explicit Dockerfile path (optional if default)
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/webapp:latest
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/webapp:latest
+            ${{ secrets.DOCKER_USERNAME }}/webapp:${{ github.sha }}
+
